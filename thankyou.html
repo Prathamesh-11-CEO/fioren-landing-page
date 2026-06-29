@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed — FIOREN®</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #EDEAE6;
+      --white:     #FFFFFF;
+      --brown:     #7D5C4E;
+      --brown-dk:  #5C4039;
+      --dark:      #1C1614;
+      --muted:     #6B5C55;
+      --border:    #DDD8D3;
+      --taupe:     #C4A897;
+      --green:     #3A7D5C;
+      --green-bg:  #E8F4EE;
+      --green-bd:  #B2D9C5;
+      --ff-serif:  'Playfair Display', Georgia, serif;
+      --ff-sans:   'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--ff-sans);
+      background: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-logo {
+      font-family: var(--ff-serif);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--dark);
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 56px 48px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 32px rgba(124,92,78,.10);
+    }
+
+    /* animated checkmark */
+    .check-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--green-bg);
+      border: 2px solid var(--green-bd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      animation: pop .4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes pop {
+      0%   { transform: scale(.6); opacity: 0; }
+      80%  { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    .check-circle svg { color: var(--green); }
+
+    .confirm-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--taupe);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .confirm-title {
+      font-family: var(--ff-serif);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .confirm-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 32px;
+    }
+
+    .payment-id-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 32px;
+      display: none;
+    }
+    .payment-id-box.visible { display: block; }
+    .pid-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--taupe);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .pid-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark);
+      word-break: break-all;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brown);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .step-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .step-text span  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 0 32px;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dk) 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      padding: 15px 36px;
+      font-family: var(--ff-sans);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: filter .15s, transform .15s;
+    }
+    .btn-home:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 36px 24px; border-radius: 16px; }
+      .confirm-title { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">FIOREN<sup style="font-size:11px;vertical-align:super;">®</sup></div>
+</nav>
+
+<main class="main">
+  <div class="card">
+
+    <div class="check-circle">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+
+    <p class="confirm-label">Order Confirmed</p>
+    <h1 class="confirm-title">Thank you for your<br>purchase!</h1>
+    <p class="confirm-desc">
+      Your FIOREN® Advanced Anti-Ageing Renewal Cream is on its way.
+      You'll receive a confirmation email shortly with tracking details.
+    </p>
+
+    <div class="payment-id-box" id="pidBox">
+      <div class="pid-label">Payment Reference</div>
+      <div class="pid-value" id="pidValue">—</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Order Processing</strong>
+          <span>We're preparing your order for dispatch within 24 hours.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Shipped &amp; Tracked</strong>
+          <span>You'll get an SMS/email with your tracking number once shipped.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Delivered in 3–5 Days</strong>
+          <span>Free delivery on your prepaid order. Sit back and relax!</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="/" class="btn-home">← Continue Shopping</a>
+
+  </div>
+</main>
+
+<footer class="footer">
+  © 2026 FIOREN® · All rights reserved
+</footer>
+
+<script>
+  // Show payment ID from URL if present
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('payment_id');
+  if (pid) {
+    document.getElementById('pidValue').textContent = pid;
+    document.getElementById('pidBox').classList.add('visible');
+  }
+</script>
+
+</body>
+</html>
