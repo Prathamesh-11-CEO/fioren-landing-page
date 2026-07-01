@@ -565,8 +565,8 @@
 </footer>
 
 <script>
-  const UNIT_PRICE = 100; // paise — TEST MODE ₹1, revert to 159900 before going live
-  const UNIT_MRP   = 100; // paise — TEST MODE ₹1, revert to 189900 before going live
+  const UNIT_PRICE = 100; // TEST MODE ₹1 — revert to 159900 before going live
+  const UNIT_MRP   = 100; // TEST MODE ₹1 — revert to 189900 before going live
 
   let qty = 1;
 
@@ -650,15 +650,13 @@
     btn.textContent = 'Please wait…';
 
     try {
-      const amount = UNIT_PRICE * qty;
-
       const [configRes, orderRes] = await Promise.all([
         fetch('/api/config'),
         fetch('/api/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount,
+            quantity: qty,
             currency: 'INR',
             receipt: `fioren_${Date.now()}`,
             notes: {
@@ -666,7 +664,6 @@
               customer_email:   email,
               customer_phone:   phone,
               delivery_address: fullAddress,
-              quantity:         String(qty),
             },
           }),
         }),
@@ -706,8 +703,6 @@
                 billing_city:        city,
                 billing_state:       state,
                 billing_pincode:     pin,
-                quantity:            qty,
-                amount:              UNIT_PRICE * qty,
               }),
             });
             if (!verifyRes.ok) throw new Error('Verification failed');

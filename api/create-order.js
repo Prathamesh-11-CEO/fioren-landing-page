@@ -1,13 +1,15 @@
 const Razorpay = require('razorpay');
 
+const UNIT_PRICE = 100; // TEST MODE ₹1 — revert to 159900 before going live
+const MAX_QTY    = 10;
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { amount, currency = 'INR', receipt, notes } = req.body;
+  const { currency = 'INR', receipt, notes, quantity } = req.body;
 
-  if (!amount || amount < 100) {
-    return res.status(400).json({ error: 'Amount must be at least 100 paise (₹1)' });
-  }
+  const qty    = Math.max(1, Math.min(MAX_QTY, parseInt(quantity, 10) || 1));
+  const amount = UNIT_PRICE * qty;
 
   const razorpay = new Razorpay({
     key_id:     process.env.RAZORPAY_KEY_ID,
@@ -19,7 +21,7 @@ module.exports = async (req, res) => {
       amount,
       currency,
       receipt: receipt || `rcpt_${Date.now()}`,
-      notes:   notes || {},
+      notes:   { ...(notes || {}), quantity: String(qty) },
     });
     res.json({ order_id: order.id, amount: order.amount, currency: order.currency });
   } catch (err) {

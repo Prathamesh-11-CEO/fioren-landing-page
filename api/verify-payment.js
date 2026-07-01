@@ -1,7 +1,19 @@
 const crypto     = require('crypto');
 const nodemailer = require('nodemailer');
+const Razorpay   = require('razorpay');
 
-// ── Email ────────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function escHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ── Email ─────────────────────────────────────────────────────────────────────
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -44,9 +56,9 @@ function orderEmailHtml({ name, email, phone, address, qty, amount, paymentId, o
               <tr><td style="background:#EDEAE6;border-radius:8px;padding:20px 24px;">
                 <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C4A897;margin-bottom:14px;">Customer Details</div>
                 <table width="100%" cellpadding="4" cellspacing="0" style="font-size:13px;color:#1C1614;">
-                  <tr><td style="color:#6B5C55;width:130px;">Name</td><td><strong>${name}</strong></td></tr>
-                  <tr><td style="color:#6B5C55;">Email</td><td>${email}</td></tr>
-                  <tr><td style="color:#6B5C55;">Phone</td><td>${phone}</td></tr>
+                  <tr><td style="color:#6B5C55;width:130px;">Name</td><td><strong>${escHtml(name)}</strong></td></tr>
+                  <tr><td style="color:#6B5C55;">Email</td><td>${escHtml(email)}</td></tr>
+                  <tr><td style="color:#6B5C55;">Phone</td><td>${escHtml(phone)}</td></tr>
                 </table>
               </td></tr>
             </table>
@@ -55,7 +67,7 @@ function orderEmailHtml({ name, email, phone, address, qty, amount, paymentId, o
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
               <tr><td style="background:#EDEAE6;border-radius:8px;padding:20px 24px;">
                 <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C4A897;margin-bottom:10px;">Delivery Address</div>
-                <div style="font-size:13px;color:#1C1614;line-height:1.7;">${address}</div>
+                <div style="font-size:13px;color:#1C1614;line-height:1.7;">${escHtml(address)}</div>
               </td></tr>
             </table>
 
@@ -65,10 +77,10 @@ function orderEmailHtml({ name, email, phone, address, qty, amount, paymentId, o
                 <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C4A897;margin-bottom:14px;">Order Details</div>
                 <table width="100%" cellpadding="4" cellspacing="0" style="font-size:13px;color:#1C1614;">
                   <tr><td style="color:#6B5C55;width:130px;">Product</td><td>FIOREN® Advanced Anti-Ageing Renewal Cream (50g)</td></tr>
-                  <tr><td style="color:#6B5C55;">Quantity</td><td>${qty}</td></tr>
+                  <tr><td style="color:#6B5C55;">Quantity</td><td>${escHtml(String(qty))}</td></tr>
                   <tr><td style="color:#6B5C55;">Amount Paid</td><td><strong style="color:#7D5C4E;">${rupees}</strong></td></tr>
-                  <tr><td style="color:#6B5C55;">Payment ID</td><td style="font-size:12px;word-break:break-all;">${paymentId}</td></tr>
-                  <tr><td style="color:#6B5C55;">Order ID</td><td style="font-size:12px;word-break:break-all;">${orderId}</td></tr>
+                  <tr><td style="color:#6B5C55;">Payment ID</td><td style="font-size:12px;word-break:break-all;">${escHtml(paymentId)}</td></tr>
+                  <tr><td style="color:#6B5C55;">Order ID</td><td style="font-size:12px;word-break:break-all;">${escHtml(orderId)}</td></tr>
                 </table>
               </td></tr>
             </table>
@@ -94,8 +106,8 @@ async function getShiprocketToken() {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({
-      email:    process.env.shiprocket_api_user,
-      password: process.env.shiprocket_api_passowrd,
+      email:    process.env.SHIPROCKET_API_USER,
+      password: process.env.SHIPROCKET_API_PASSWORD,
     }),
   });
   if (!res.ok) throw new Error(`Shiprocket auth failed: ${res.status}`);
@@ -187,8 +199,6 @@ module.exports = async (req, res) => {
     billing_state,
     billing_pincode,
     delivery_address,
-    quantity,
-    amount,
   } = req.body;
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -205,20 +215,33 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Signature verification failed' });
   }
 
-  // 2. Send order notification email (non-blocking)
+  // 2. Fetch authoritative order details from Razorpay (amount & qty from server, not client)
+  let actualAmount = 0;
+  let actualQty    = 1;
+  try {
+    const rzp      = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET });
+    const rzpOrder = await rzp.orders.fetch(razorpay_order_id);
+    actualAmount   = rzpOrder.amount;
+    actualQty      = parseInt(rzpOrder.notes?.quantity, 10) || 1;
+  } catch (fetchErr) {
+    console.error('Razorpay order fetch failed:', fetchErr.message);
+    // non-fatal — proceed with fallback (signature already verified above)
+  }
+
+  // 3. Send order notification email (non-blocking)
   try {
     const transporter = createTransporter();
     await transporter.sendMail({
       from:    `"FIOREN® Orders" <${process.env.GMAIL_USER}>`,
       to:      process.env.GMAIL_USER,
-      subject: `New Order — ${customer_name || 'Customer'} · ₹${((amount || 0) / 100).toLocaleString('en-IN')}`,
+      subject: `New Order — ${customer_name || 'Customer'} · ₹${(actualAmount / 100).toLocaleString('en-IN')}`,
       html:    orderEmailHtml({
         name:      customer_name    || '—',
         email:     customer_email   || '—',
         phone:     customer_phone   || '—',
         address:   delivery_address || '—',
-        qty:       quantity         || 1,
-        amount:    amount           || 0,
+        qty:       actualQty,
+        amount:    actualAmount,
         paymentId: razorpay_payment_id,
         orderId:   razorpay_order_id,
       }),
@@ -227,7 +250,7 @@ module.exports = async (req, res) => {
     console.error('Order email failed:', emailErr.message);
   }
 
-  // 3. Create Shiprocket order (non-blocking)
+  // 4. Create Shiprocket order (non-blocking)
   try {
     const token    = await getShiprocketToken();
     const srResult = await createShiprocketOrder(token, {
@@ -239,8 +262,8 @@ module.exports = async (req, res) => {
       city:    billing_city     || '',
       state:   billing_state    || '',
       pincode: billing_pincode  || '',
-      qty:     quantity         || 1,
-      amount:  amount           || 0,
+      qty:     actualQty,
+      amount:  actualAmount,
       paymentId: razorpay_payment_id,
     });
     console.log('Shiprocket order created — order_id:', srResult.order_id, 'shipment_id:', srResult.shipment_id);
