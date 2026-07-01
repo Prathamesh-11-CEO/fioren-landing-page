@@ -837,51 +837,6 @@
     }
     .before-after-wrap img { width: 100%; display: block; }
 
-    /* ── NABL Download Banner ───────────────────────────────── */
-    .nabl-download-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 20px;
-      padding: 16px 20px;
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-    }
-    .nabl-banner-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 3px;
-    }
-    .nabl-banner-sub {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .btn-download {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      flex-shrink: 0;
-      padding: 10px 18px;
-      background: var(--dark);
-      color: var(--white);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-decoration: none;
-      transition: background .15s, transform .15s;
-      white-space: nowrap;
-    }
-    .btn-download:hover { background: var(--brown-dk); transform: translateY(-1px); }
-    @media (max-width: 480px) {
-      .nabl-download-banner { flex-direction: column; align-items: flex-start; }
-      .btn-download { width: 100%; justify-content: center; }
-    }
-
     /* ── Product Info / Compliance Table ───────────────────── */
     .product-info-list { display: flex; flex-direction: column; margin-top: 16px; }
     .pi-row {
@@ -2033,6 +1988,7 @@
             <img src="assets/images/gallery/gallery-application.jpeg" alt="FIOREN 7">
             <img src="assets/images/gallery/gallery-before-after.jpeg" alt="FIOREN 8">
             <img src="assets/images/gallery/gallery-certified.jpeg" alt="FIOREN 9">
+            <img src="assets/images/certifications/nabl%20report.png" alt="NABL Lab Report">
           </div>
         </div>
         <div class="gallery-thumbs">
@@ -2045,6 +2001,7 @@
           <div class="gallery-thumb" onclick="setImg(this,'assets/images/gallery/gallery-application.jpeg')"><img src="assets/images/gallery/gallery-application.jpeg" alt="Application" /></div>
           <div class="gallery-thumb" onclick="setImg(this,'assets/images/gallery/gallery-before-after.jpeg')"><img src="assets/images/gallery/gallery-before-after.jpeg" alt="Before After" /></div>
           <div class="gallery-thumb" onclick="setImg(this,'assets/images/gallery/gallery-certified.jpeg')"><img src="assets/images/gallery/gallery-certified.jpeg" alt="Certified" /></div>
+          <div class="gallery-thumb" onclick="setImg(this,'assets/images/certifications/nabl%20report.png')"><img src="assets/images/certifications/nabl%20report.png" alt="NABL Report" /></div>
         </div>
         <div class="gallery-dots" id="galleryDots"></div>
       </div>
@@ -2194,16 +2151,6 @@
               <div class="cert-card-lg"><div class="cert-seal"><img src="assets/images/certifications/fda.png" alt="US FDA Certified"></div></div>
             </div>
 
-            <div class="nabl-download-banner">
-              <div class="nabl-banner-text">
-                <div class="nabl-banner-title">NABL Accredited Lab Test Report</div>
-                <div class="nabl-banner-sub">Independent third-party testing · Verified safe for all skin types</div>
-              </div>
-              <a href="assets/docs/fioren-nabl-lab-report.pdf" download="FIOREN_NABL_Lab_Report.pdf" class="btn-download">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download Report
-              </a>
-            </div>
           </div></div>
         </div>
 
