@@ -17,6 +17,7 @@
       --muted:     #6B5C55;
       --border:    #DDD8D3;
       --taupe:     #C4A897;
+      --radius-sm: 6px;
       --green:     #3A7D5C;
       --green-bg:  #E8F4EE;
       --green-bd:  #B2D9C5;
@@ -194,12 +195,106 @@
     .btn-home:hover { filter: brightness(1.12); transform: translateY(-1px); }
 
     /* ── Footer ── */
-    .footer {
-      text-align: center;
-      padding: 24px;
+
+    /* ── Footer (universal) ── */
+    footer {
+      background: var(--dark);
+      color: #BDB5B0;
+      padding: 56px 48px 28px;
+    }
+    .footer-inner { max-width: 1280px; margin: 0 auto; }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.6fr repeat(2, 1fr);
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-logo {
+      font-family: var(--ff-serif);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .footer-tagline { font-size: 13px; color: #8A7E79; line-height: 1.7; margin-bottom: 24px; }
+    .footer-contact { font-size: 13px; color: #8A7E79; line-height: 1.9; margin-bottom: 24px; }
+    .footer-contact a { color: #8A7E79; transition: color .15s; }
+    .footer-contact a:hover { color: var(--taupe); }
+    .footer-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .footer-links a { font-size: 13px; color: #8A7E79; transition: color .15s; }
+    .footer-links a:hover { color: var(--taupe); }
+    .nl-form { display: flex; gap: 8px; }
+    .nl-input {
+      flex: 1;
+      padding: 11px 14px;
+      background: #2C2420;
+      border: 1px solid #4A3E38;
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: var(--ff-sans);
+      font-size: 13px;
+    }
+    .nl-input::placeholder { color: #5A4E4A; }
+    .nl-btn {
+      padding: 11px 18px;
+      background: var(--brown);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
       font-size: 12px;
-      color: var(--muted);
-      flex-shrink: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .nl-btn:hover { background: var(--brown-dk); }
+    .footer-divider { height: 1px; background: #2C2420; margin-bottom: 24px; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-copyright { font-size: 12px; color: #5A4E4A; }
+    .social-icons { display: flex; gap: 10px; }
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      background: #2C2420;
+      border: 1px solid #4A3E38;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #8A7E79;
+      transition: background .15s, color .15s;
+    }
+    .social-icon:hover { background: var(--brown); color: var(--white); }
+
+    @media (max-width: 1023px) {
+      footer { padding: 56px 24px 28px; }
+      .footer-top { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 767px) {
+      footer { padding: 48px 16px 24px; }
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+      .footer-brand { grid-column: auto; }
+      .nl-form { flex-direction: column; gap: 8px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-links { gap: 9px; }
     }
 
     @media (max-width: 600px) {
@@ -266,8 +361,61 @@
   </div>
 </main>
 
-<footer class="footer">
-  © 2026 FIOREN® · All rights reserved
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo">FIOREN<sup style="font-size:10px;vertical-align:super;">&reg;</sup></div>
+        <p class="footer-tagline">
+          Advanced skincare crafted in India's most advanced scientific facility.<br/>WHO &middot; GMP &middot; US FDA certified for your trust.
+        </p>
+        <div class="footer-contact">
+          <a href="mailto:business@bioreachpharma.com">business@bioreachpharma.com</a><br/>
+          <a href="mailto:contact@bioreachpharma.com">contact@bioreachpharma.com</a><br/>
+          <a href="tel:+919270713844">+91 92707 13844</a> &nbsp;&middot;&nbsp; <a href="tel:+919130113844">+91 91301 13844</a>
+        </div>
+        <div class="footer-col-title" style="margin-bottom:12px;">STAY IN THE LOOP</div>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="Your email address" />
+          <button class="nl-btn">SUBSCRIBE</button>
+        </div>
+      </div>
+
+<div>
+        <div class="footer-col-title">COMPANY</div>
+        <ul class="footer-links">
+          <li><a href="#">About Fioren</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">SUPPORT</div>
+        <ul class="footer-links">
+          <li><a href="mailto:contact@bioreachpharma.com">Contact Us</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="/refund-policy.html">Returns &amp; Refunds</a></li>
+          <li><a href="/shipping-policy.html">Shipping Policy</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      <div class="footer-copyright">&copy; 2026 Fioren&reg;. All rights reserved by <a href="https://www.bioreachpharma.com/" target="_blank" rel="noopener" style="color:inherit;">Bioreach Pharma Exports Pvt. Ltd.</a> &middot; Made in India &middot; WHO &middot; GMP &middot; US FDA Certified</div>
+      <div class="social-icons">
+        <div class="social-icon">f</div>
+        <div class="social-icon">ig</div>
+        <div class="social-icon">yt</div>
+        <div class="social-icon">in</div>
+      </div>
+    </div>
+  </div>
 </footer>
 
 <script>

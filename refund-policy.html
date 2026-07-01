@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Refund &amp; Returns Policy — FIOREN®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #EDEAE6;
+    --white:     #FFFFFF;
+    --brown:     #7D5C4E;
+    --brown-dk:  #5C4039;
+    --dark:      #1C1614;
+    --muted:     #6B5C55;
+    --border:    #DDD8D3;
+    --taupe:     #C4A897;
+    --radius-sm: 6px;
+    --ff-serif:  'Playfair Display', Georgia, serif;
+    --ff-sans:   'DM Sans', system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--ff-sans);
+    background: var(--bg);
+    color: var(--dark);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-logo { font-family: var(--ff-serif); font-size: 24px; font-weight: 800; letter-spacing: 3px; color: var(--dark); text-decoration: none; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .page-label { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; color: var(--taupe); text-transform: uppercase; margin-bottom: 14px; }
+  .page-title { font-family: var(--ff-serif); font-size: 36px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+  .page-meta { font-size: 13px; color: var(--muted); margin-bottom: 36px; }
+  .page-meta span { display: inline-block; margin-right: 18px; }
+
+  .intro { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; font-size: 14px; line-height: 1.85; color: var(--muted); margin-bottom: 40px; }
+  .intro strong { color: var(--dark); }
+
+  .policy-section { margin-bottom: 34px; }
+  .policy-section h2 {
+    font-family: var(--ff-serif);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .policy-section h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brown-dk);
+    margin: 18px 0 8px;
+  }
+  .policy-section p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .policy-section ul {
+    list-style: none;
+    margin-bottom: 12px;
+  }
+  .policy-section ul li {
+    position: relative;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--muted);
+    padding-left: 20px;
+    margin-bottom: 8px;
+  }
+  .policy-section ul li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--taupe);
+  }
+  .policy-section a { color: var(--brown); text-decoration: underline; }
+
+  .contact-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--taupe);
+    border-radius: 12px;
+    padding: 24px 28px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+  .contact-card strong { display: block; color: var(--dark); font-size: 15px; margin-bottom: 8px; font-family: var(--ff-serif); }
+  .contact-card a { color: var(--brown); text-decoration: none; font-weight: 600; }
+  .contact-card a:hover { text-decoration: underline; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--brown); text-decoration: none; margin-bottom: 28px; }
+  .back-link:hover { color: var(--brown-dk); }
+
+    /* ── Footer (universal) ── */
+    footer {
+      background: var(--dark);
+      color: #BDB5B0;
+      padding: 56px 48px 28px;
+    }
+    .footer-inner { max-width: 1280px; margin: 0 auto; }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.6fr repeat(2, 1fr);
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-logo {
+      font-family: var(--ff-serif);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .footer-tagline { font-size: 13px; color: #8A7E79; line-height: 1.7; margin-bottom: 24px; }
+    .footer-contact { font-size: 13px; color: #8A7E79; line-height: 1.9; margin-bottom: 24px; }
+    .footer-contact a { color: #8A7E79; transition: color .15s; }
+    .footer-contact a:hover { color: var(--taupe); }
+    .footer-col-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .footer-links a { font-size: 13px; color: #8A7E79; transition: color .15s; }
+    .footer-links a:hover { color: var(--taupe); }
+    .nl-form { display: flex; gap: 8px; }
+    .nl-input {
+      flex: 1;
+      padding: 11px 14px;
+      background: #2C2420;
+      border: 1px solid #4A3E38;
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: var(--ff-sans);
+      font-size: 13px;
+    }
+    .nl-input::placeholder { color: #5A4E4A; }
+    .nl-btn {
+      padding: 11px 18px;
+      background: var(--brown);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .nl-btn:hover { background: var(--brown-dk); }
+    .footer-divider { height: 1px; background: #2C2420; margin-bottom: 24px; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-copyright { font-size: 12px; color: #5A4E4A; }
+    .social-icons { display: flex; gap: 10px; }
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      background: #2C2420;
+      border: 1px solid #4A3E38;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #8A7E79;
+      transition: background .15s, color .15s;
+    }
+    .social-icon:hover { background: var(--brown); color: var(--white); }
+
+    @media (max-width: 1023px) {
+      footer { padding: 56px 24px 28px; }
+      .footer-top { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 767px) {
+      footer { padding: 48px 16px 24px; }
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+      .footer-brand { grid-column: auto; }
+      .nl-form { flex-direction: column; gap: 8px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-links { gap: 9px; }
+    }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 36px 18px 72px; }
+    .page-title { font-size: 28px; }
+    .intro, .contact-card { padding: 18px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">FIOREN<sup style="font-size:11px;vertical-align:super;">®</sup></a>
+</nav>
+
+<div class="wrap">
+
+  <a href="/" class="back-link">&larr; Back to Home</a>
+
+  <p class="page-label">Legal</p>
+  <h1 class="page-title">Refund and Returns Policy</h1>
+  <p class="page-meta"><span>Effective Date: 2026</span><span>Last Updated: 2026</span></p>
+
+  <div class="intro">
+    This Refund, Return &amp; Cancellation Policy (&ldquo;Policy&rdquo;) applies to all purchases made from <strong>Fioren</strong>, operated by <strong><a href="https://www.bioreachpharma.com/" target="_blank" rel="noopener" style="color:inherit;">Bioreach Pharma Exports Pvt. Ltd.</a></strong>, through our official website, Amazon storefront, marketplaces, and authorized sales channels.
+    <br/><br/>
+    By purchasing our products, customers agree to the terms outlined below.
+  </div>
+
+  <div class="policy-section">
+    <h2>General Policy</h2>
+    <p>Due to the hygienic and personal-use nature of skincare and cosmetic products, Fioren follows a strict quality-controlled return and refund policy to protect customer safety, product integrity, and prevent misuse or fraudulent claims.</p>
+    <p>We reserve the right to refuse any return, refund, replacement, or cancellation request that does not comply with this Policy.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Eligible Conditions for Return or Replacement</h2>
+    <p>Returns or replacements may only be considered under the following circumstances:</p>
+    <ul>
+      <li>Product received is physically damaged during transit</li>
+      <li>Wrong product delivered</li>
+      <li>Product missing from the order</li>
+      <li>Product received is expired</li>
+      <li>Product packaging is tampered before delivery</li>
+      <li>Manufacturing defect verified by our quality team</li>
+    </ul>
+    <p>All claims are subject to verification and approval by Fioren.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Non-Returnable &amp; Non-Refundable Products</h2>
+    <p>The following products shall NOT be eligible for return, exchange, or refund:</p>
+    <ul>
+      <li>Opened or used products</li>
+      <li>Products with broken seals</li>
+      <li>Products damaged due to misuse, negligence, or improper storage</li>
+      <li>Products purchased during special sales, promotional campaigns, clearance sales, or combo offers</li>
+      <li>Products returned without original packaging</li>
+      <li>Products returned without proof of purchase</li>
+      <li>Change of mind purchases</li>
+      <li>Skin compatibility or personal preference dissatisfaction</li>
+      <li>Minor packaging variations not affecting product quality</li>
+      <li>Delayed deliveries caused by courier partners, natural disasters, strikes, weather, or force majeure events</li>
+    </ul>
+    <p>For hygiene and safety reasons, cosmetic and skincare products once opened cannot be resold or restocked.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Mandatory Unboxing Video Requirement</h2>
+    <p>To process claims related to:</p>
+    <ul>
+      <li>Damaged products</li>
+      <li>Leakage</li>
+      <li>Missing items</li>
+      <li>Wrong products</li>
+    </ul>
+    <p>Customers MUST provide:</p>
+    <ul>
+      <li>A clear continuous unboxing video starting before opening the package</li>
+      <li>Visible shipping label in the video</li>
+      <li>Complete product visibility without cuts or edits</li>
+    </ul>
+    <p>Failure to provide a valid unboxing video may result in rejection of the claim. Screenshots or photos alone may not be considered sufficient evidence.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Claim Reporting Timeline</h2>
+    <p>Customers must report issues within:</p>
+    <ul>
+      <li>24 hours of delivery for damaged, leaked, wrong, or missing products</li>
+      <li>48 hours for manufacturing defects</li>
+    </ul>
+    <p>Claims reported after the specified timeframe may not be accepted.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Return Approval Process</h2>
+    <p>All return or replacement requests undergo internal verification. Fioren reserves the right to:</p>
+    <ul>
+      <li>Request additional evidence</li>
+      <li>Conduct investigation</li>
+      <li>Reject suspicious or fraudulent claims</li>
+      <li>Limit returns from accounts with excessive return history</li>
+    </ul>
+    <p>Approval or rejection of claims shall be at the sole discretion of Fioren.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Refund Policy</h2>
+    <h3>Approved Refunds</h3>
+    <p>If a refund request is approved:</p>
+    <ul>
+      <li>Refunds will be processed to the original payment method</li>
+      <li>Processing may take 5&ndash;10 business days depending on banking/payment gateway timelines</li>
+    </ul>
+    <h3>Cash on Delivery (COD) Orders</h3>
+    <p>For COD orders, refunds may be processed via bank transfer, UPI, or store credit after verification.</p>
+    <h3>Shipping Charges</h3>
+    <p>Shipping fees, COD charges, platform fees, convenience charges, and taxes may be non-refundable unless the error is caused solely by Fioren.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Replacement Policy</h2>
+    <p>Where applicable, Fioren may offer:</p>
+    <ul>
+      <li>Product replacement</li>
+      <li>Store credit</li>
+      <li>Coupon code</li>
+      <li>Partial refund</li>
+    </ul>
+    <p>instead of a full refund depending on the nature of the claim.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Cancellation Policy</h2>
+    <h3>Website Orders</h3>
+    <p>Orders may be cancelled only before dispatch. Once an order is shipped, cancellation requests may not be accepted.</p>
+    <h3>Amazon &amp; Marketplace Orders</h3>
+    <p>Orders placed through Amazon or third-party marketplaces shall be governed additionally by their respective cancellation and return policies.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Failed Delivery / RTO (Return to Origin)</h2>
+    <p>If an order is returned due to:</p>
+    <ul>
+      <li>Incorrect address</li>
+      <li>Customer unavailable</li>
+      <li>Refusal to accept delivery</li>
+      <li>Failure to respond to courier</li>
+    </ul>
+    <p>then:</p>
+    <ul>
+      <li>Re-shipping charges may apply</li>
+      <li>Original shipping fees may be deducted from refunds</li>
+      <li>COD orders may become ineligible for future COD purchases</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>Fraud Prevention &amp; Abuse Control</h2>
+    <p>Fioren maintains strict anti-fraud systems. We reserve the right to:</p>
+    <ul>
+      <li>Block suspicious users</li>
+      <li>Refuse future orders</li>
+      <li>Deny refunds/replacements</li>
+      <li>Initiate legal action in cases of fraudulent activity, payment disputes, abuse, false claims, or chargeback misuse</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>Limitation of Liability</h2>
+    <p>Fioren&rsquo;s maximum liability under any circumstance shall not exceed the actual amount paid by the customer for the product.</p>
+    <p>We shall not be liable for:</p>
+    <ul>
+      <li>Indirect losses</li>
+      <li>Emotional distress</li>
+      <li>Allergic reactions due to undisclosed sensitivities</li>
+      <li>Improper product usage</li>
+      <li>Third-party courier delays</li>
+      <li>Consequential damages</li>
+    </ul>
+    <p>Customers are advised to perform patch tests before using skincare products.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Product Results Disclaimer</h2>
+    <p>Results from skincare and cosmetic products may vary based on:</p>
+    <ul>
+      <li>Skin type</li>
+      <li>Lifestyle</li>
+      <li>Usage consistency</li>
+      <li>Medical conditions</li>
+      <li>Environmental factors</li>
+    </ul>
+    <p>Fioren does not guarantee identical results for every individual.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Quality Assurance</h2>
+    <p>All products are quality checked before dispatch. Products are packed securely using protective packaging standards to minimize transit damage.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Customer Support</h2>
+    <p>For return or refund assistance, contact:</p>
+    <div class="contact-card">
+      <strong>Fioren &mdash; <a href="https://www.bioreachpharma.com/" target="_blank" rel="noopener" style="color:inherit;">Bioreach Pharma Exports Pvt. Ltd.</a></strong>
+      Email: <a href="mailto:contact@bioreachpharma.com">contact@bioreachpharma.com</a><br/>
+      Website: <a href="https://www.fioren.store" target="_blank" rel="noopener">www.fioren.store</a><br/>
+      Support Hours: Mon &ndash; Fri, 11am &ndash; 6pm
+    </div>
+  </div>
+
+  <div class="policy-section">
+    <h2>Policy Modification Rights</h2>
+    <p>Fioren reserves the right to update, modify, suspend, or replace this Policy at any time without prior notice. Customers are advised to review the Policy periodically before placing orders.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Governing Law &amp; Jurisdiction</h2>
+    <p>This Policy shall be governed by and interpreted in accordance with the laws of India. Any disputes arising shall be subject to the exclusive jurisdiction of courts located in Maharashtra.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo">FIOREN<sup style="font-size:10px;vertical-align:super;">&reg;</sup></div>
+        <p class="footer-tagline">
+          Advanced skincare crafted in India's most advanced scientific facility.<br/>WHO &middot; GMP &middot; US FDA certified for your trust.
+        </p>
+        <div class="footer-contact">
+          <a href="mailto:business@bioreachpharma.com">business@bioreachpharma.com</a><br/>
+          <a href="mailto:contact@bioreachpharma.com">contact@bioreachpharma.com</a><br/>
+          <a href="tel:+919270713844">+91 92707 13844</a> &nbsp;&middot;&nbsp; <a href="tel:+919130113844">+91 91301 13844</a>
+        </div>
+        <div class="footer-col-title" style="margin-bottom:12px;">STAY IN THE LOOP</div>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="Your email address" />
+          <button class="nl-btn">SUBSCRIBE</button>
+        </div>
+      </div>
+
+<div>
+        <div class="footer-col-title">COMPANY</div>
+        <ul class="footer-links">
+          <li><a href="#">About Fioren</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">SUPPORT</div>
+        <ul class="footer-links">
+          <li><a href="mailto:contact@bioreachpharma.com">Contact Us</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="/refund-policy.html">Returns &amp; Refunds</a></li>
+          <li><a href="/shipping-policy.html">Shipping Policy</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      <div class="footer-copyright">&copy; 2026 Fioren&reg;. All rights reserved by <a href="https://www.bioreachpharma.com/" target="_blank" rel="noopener" style="color:inherit;">Bioreach Pharma Exports Pvt. Ltd.</a> &middot; Made in India &middot; WHO &middot; GMP &middot; US FDA Certified</div>
+      <div class="social-icons">
+        <div class="social-icon">f</div>
+        <div class="social-icon">ig</div>
+        <div class="social-icon">yt</div>
+        <div class="social-icon">in</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
