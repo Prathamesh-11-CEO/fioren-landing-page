@@ -319,7 +319,7 @@
     </div>
 
     <p class="confirm-label">Order Confirmed</p>
-    <h1 class="confirm-title">Thank you for your<br>purchase!</h1>
+    <h1 class="confirm-title" id="confirm-title">Thank you for your<br>purchase!</h1>
     <p class="confirm-desc">
       Your FIOREN® Advanced Anti-Ageing Renewal Cream is on its way.
       You'll receive a confirmation email shortly with tracking details.
@@ -419,8 +419,16 @@
 </footer>
 
 <script>
-  // Show payment ID from URL if present
   const params = new URLSearchParams(window.location.search);
+
+  // Personalise heading with customer name if available
+  const name = params.get('name');
+  if (name) {
+    document.getElementById('confirm-title').innerHTML =
+      `Thank you, ${name.split(' ')[0]}!<br>Your order is confirmed.`;
+  }
+
+  // Show payment reference ID
   const pid = params.get('payment_id');
   if (pid) {
     document.getElementById('pidValue').textContent = pid;

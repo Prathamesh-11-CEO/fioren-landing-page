@@ -7,8 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
   <style>
     /* ── DESIGN TOKENS ──────────────────────────────────────── */
     :root {
@@ -3101,91 +3099,10 @@
     item.classList.toggle('open', !isOpen);
   }
 
-  /* ── Razorpay Checkout ── */
-  async function startCheckout() {
-    const btn = document.getElementById('add-to-cart-btn');
+  /* ── Checkout redirect ── */
+  function startCheckout() {
     const qty = parseInt(document.getElementById('qty').textContent, 10) || 1;
-    const unitPaise = 159900; // ₹1,599 in paise
-    const amount = unitPaise * qty;
-
-    btn.disabled = true;
-    btn.textContent = 'Please wait…';
-
-    try {
-      // 1. Fetch public key from server (KEY_SECRET never leaves backend)
-      const [configRes, orderRes] = await Promise.all([
-        fetch('/api/config'),
-        fetch('/api/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, currency: 'INR', receipt: `fioren_${Date.now()}` }),
-        }),
-      ]);
-
-      if (!configRes.ok || !orderRes.ok) throw new Error('Could not initiate payment');
-
-      const { key_id } = await configRes.json();
-      const { order_id, amount: orderAmount, currency } = await orderRes.json();
-
-      // 2. Open Razorpay modal
-      const options = {
-        key: key_id,
-        amount: orderAmount,
-        currency,
-        name: 'FIOREN®',
-        description: `Advanced Anti-Ageing Renewal Cream × ${qty}`,
-        image: 'assets/images/gallery/gallery-product.jpeg',
-        order_id,
-        theme: { color: '#7D5C4E' },
-        prefill: { name: '', email: '', contact: '' },
-        modal: {
-          ondismiss: () => resetBtn(btn),
-        },
-        handler: async (response) => {
-          // 3. Verify signature on backend
-          try {
-            const verifyRes = await fetch('/api/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id:   response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature:  response.razorpay_signature,
-              }),
-            });
-
-            if (!verifyRes.ok) throw new Error('Verification failed');
-
-            showSuccess(btn, response.razorpay_payment_id);
-          } catch {
-            showError(btn, 'Payment verification failed. Please contact support.');
-          }
-        },
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.on('payment.failed', (r) => {
-        showError(btn, r.error.description || 'Payment failed. Please try again.');
-      });
-      rzp.open();
-
-    } catch (err) {
-      showError(btn, err.message || 'Something went wrong. Please try again.');
-    }
-  }
-
-  function resetBtn(btn) {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> BUY NOW';
-  }
-
-  function showSuccess(_btn, paymentId) {
-    window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(paymentId)}`;
-  }
-
-  function showError(btn, message) {
-    resetBtn(btn);
-    alert(message);
+    window.location.href = `/checkout.html?qty=${qty}`;
   }
 </script>
 

@@ -3,7 +3,7 @@ const Razorpay = require('razorpay');
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { amount, currency = 'INR', receipt } = req.body;
+  const { amount, currency = 'INR', receipt, notes } = req.body;
 
   if (!amount || amount < 100) {
     return res.status(400).json({ error: 'Amount must be at least 100 paise (₹1)' });
@@ -19,6 +19,7 @@ module.exports = async (req, res) => {
       amount,
       currency,
       receipt: receipt || `rcpt_${Date.now()}`,
+      notes:   notes || {},
     });
     res.json({ order_id: order.id, amount: order.amount, currency: order.currency });
   } catch (err) {

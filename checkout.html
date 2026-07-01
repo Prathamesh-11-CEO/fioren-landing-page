@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — FIOREN®</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #EDEAE6;
+      --white:     #FFFFFF;
+      --brown:     #7D5C4E;
+      --brown-dk:  #5C4039;
+      --dark:      #1C1614;
+      --muted:     #6B5C55;
+      --border:    #DDD8D3;
+      --taupe:     #C4A897;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --ff-serif:  'Playfair Display', Georgia, serif;
+      --ff-sans:   'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--ff-sans);
+      background: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Nav ── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      flex-shrink: 0;
+    }
+    .nav-logo {
+      font-family: var(--ff-serif);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--dark);
+    }
+    .nav-back {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .15s;
+    }
+    .nav-back:hover { color: var(--brown); }
+
+    /* ── Main layout ── */
+    .checkout-wrap {
+      flex: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 48px 24px 64px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-family: var(--ff-serif);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Form ── */
+    .form-section { margin-bottom: 32px; }
+    .form-section:last-of-type { margin-bottom: 0; }
+    .form-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+    .field label span { color: var(--brown); }
+    .field input,
+    .field select {
+      padding: 11px 14px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
+      font-size: 14px;
+      color: var(--dark);
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--brown);
+      box-shadow: 0 0 0 3px rgba(125,92,78,.12);
+    }
+    .field input.error,
+    .field select.error { border-color: #c0392b; }
+    .field .err-msg { font-size: 11px; color: #c0392b; display: none; }
+    .field.has-error .err-msg { display: block; }
+    .field.has-error input,
+    .field.has-error select { border-color: #c0392b; }
+
+    /* select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .select-wrap select { padding-right: 32px; }
+
+    /* ── Pay button ── */
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      background: var(--brown);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-pay:hover { background: var(--brown-dk); }
+    .btn-pay:active { transform: translateY(1px); }
+    .btn-pay:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    .secure-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* ── Order summary card ── */
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      position: sticky;
+      top: 24px;
+    }
+    .summary-product {
+      display: flex;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .summary-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .summary-product-name {
+      font-family: var(--ff-serif);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .summary-product-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* qty control */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      width: fit-content;
+    }
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      background: var(--bg);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+    .qty-btn:hover { background: var(--border); }
+    .qty-val {
+      min-width: 36px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+
+    /* price rows */
+    .price-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .price-row.total {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--dark);
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .price-row .savings { color: #3A7D5C; }
+    .price-row .strike { text-decoration: line-through; }
+
+    .free-delivery-badge {
+      background: #E8F4EE;
+      border: 1px solid #B2D9C5;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #3A7D5C;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* ── Footer ── */
+    footer { background: var(--dark); color: #BDB5B0; padding: 56px 48px 28px; }
+    .footer-inner { max-width: 1280px; margin: 0 auto; }
+    .footer-top { display: grid; grid-template-columns: 1.6fr repeat(2, 1fr); gap: 40px; margin-bottom: 40px; }
+    .footer-logo { font-family: var(--ff-serif); font-size: 22px; font-weight: 800; letter-spacing: 3px; color: var(--white); margin-bottom: 12px; }
+    .footer-tagline { font-size: 13px; color: #8A7E79; line-height: 1.7; margin-bottom: 24px; }
+    .footer-contact { font-size: 13px; color: #8A7E79; line-height: 1.9; margin-bottom: 24px; }
+    .footer-contact a { color: #8A7E79; transition: color .15s; }
+    .footer-contact a:hover { color: var(--taupe); }
+    .footer-col-title { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white); margin-bottom: 16px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .footer-links a { font-size: 13px; color: #8A7E79; transition: color .15s; }
+    .footer-links a:hover { color: var(--taupe); }
+    .nl-form { display: flex; gap: 8px; }
+    .nl-input { flex: 1; padding: 11px 14px; background: #2C2420; border: 1px solid #4A3E38; border-radius: var(--radius-sm); color: var(--white); font-family: var(--ff-sans); font-size: 13px; }
+    .nl-input::placeholder { color: #5A4E4A; }
+    .nl-btn { padding: 11px 18px; background: var(--brown); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: var(--ff-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; transition: background .15s; }
+    .nl-btn:hover { background: var(--brown-dk); }
+    .footer-divider { height: 1px; background: #2C2420; margin-bottom: 24px; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .footer-copyright { font-size: 12px; color: #5A4E4A; }
+    .social-icons { display: flex; gap: 10px; }
+    .social-icon { width: 36px; height: 36px; background: #2C2420; border: 1px solid #4A3E38; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #8A7E79; transition: background .15s, color .15s; }
+    .social-icon:hover { background: var(--brown); color: var(--white); }
+
+    @media (max-width: 1023px) {
+      footer { padding: 56px 24px 28px; }
+      .footer-top { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 767px) {
+      .nav { padding: 0 16px; }
+      .checkout-wrap {
+        grid-template-columns: 1fr;
+        padding: 24px 16px 48px;
+        gap: 28px;
+      }
+      /* show summary below form on mobile */
+      .form-col { order: 1; }
+      .summary-col { order: 2; position: static; }
+      .summary-card { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-row.three { grid-template-columns: 1fr 1fr; }
+      footer { padding: 48px 16px 24px; }
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+      .footer-brand { grid-column: auto; }
+      .nl-form { flex-direction: column; gap: 8px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-links { gap: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">FIOREN<sup style="font-size:10px;vertical-align:super;">&reg;</sup></a>
+  <a href="/" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to product
+  </a>
+</nav>
+
+<div class="checkout-wrap">
+
+  <!-- ── Left: Form ── -->
+  <div class="form-col">
+    <div class="section-title">Checkout</div>
+
+    <!-- Contact Information -->
+    <div class="form-section">
+      <div class="form-subtitle">Contact Information</div>
+      <div class="form-row full" style="margin-bottom:14px;">
+        <div class="field" id="f-name">
+          <label>Full Name <span>*</span></label>
+          <input type="text" id="inp-name" placeholder="Priya Sharma" autocomplete="name" />
+          <span class="err-msg">Please enter your full name</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field" id="f-email">
+          <label>Email <span>*</span></label>
+          <input type="email" id="inp-email" placeholder="priya@example.com" autocomplete="email" />
+          <span class="err-msg">Please enter a valid email</span>
+        </div>
+        <div class="field" id="f-phone">
+          <label>Phone <span>*</span></label>
+          <input type="tel" id="inp-phone" placeholder="9876543210" maxlength="10" autocomplete="tel" />
+          <span class="err-msg">Enter a valid 10-digit number</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Address -->
+    <div class="form-section">
+      <div class="form-subtitle">Delivery Address</div>
+      <div class="form-row full" style="margin-bottom:14px;">
+        <div class="field" id="f-addr1">
+          <label>Address Line 1 <span>*</span></label>
+          <input type="text" id="inp-addr1" placeholder="Flat / House no., Building name, Street" autocomplete="address-line1" />
+          <span class="err-msg">Please enter your address</span>
+        </div>
+      </div>
+      <div class="form-row full" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Address Line 2 <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+          <input type="text" id="inp-addr2" placeholder="Landmark, Area, Colony" autocomplete="address-line2" />
+        </div>
+      </div>
+      <div class="form-row three" style="margin-bottom:14px;">
+        <div class="field" id="f-city">
+          <label>City <span>*</span></label>
+          <input type="text" id="inp-city" placeholder="Mumbai" autocomplete="address-level2" />
+          <span class="err-msg">Please enter your city</span>
+        </div>
+        <div class="field" id="f-state">
+          <label>State <span>*</span></label>
+          <div class="select-wrap">
+            <select id="inp-state" autocomplete="address-level1">
+              <option value="">Select state</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Chhattisgarh</option>
+              <option>Goa</option>
+              <option>Gujarat</option>
+              <option>Haryana</option>
+              <option>Himachal Pradesh</option>
+              <option>Jharkhand</option>
+              <option>Karnataka</option>
+              <option>Kerala</option>
+              <option>Madhya Pradesh</option>
+              <option>Maharashtra</option>
+              <option>Manipur</option>
+              <option>Meghalaya</option>
+              <option>Mizoram</option>
+              <option>Nagaland</option>
+              <option>Odisha</option>
+              <option>Punjab</option>
+              <option>Rajasthan</option>
+              <option>Sikkim</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Tripura</option>
+              <option>Uttar Pradesh</option>
+              <option>Uttarakhand</option>
+              <option>West Bengal</option>
+              <option>Andaman and Nicobar Islands</option>
+              <option>Chandigarh</option>
+              <option>Dadra and Nagar Haveli and Daman and Diu</option>
+              <option>Delhi</option>
+              <option>Jammu and Kashmir</option>
+              <option>Ladakh</option>
+              <option>Lakshadweep</option>
+              <option>Puducherry</option>
+            </select>
+          </div>
+          <span class="err-msg">Please select your state</span>
+        </div>
+        <div class="field" id="f-pin">
+          <label>Pincode <span>*</span></label>
+          <input type="text" id="inp-pin" placeholder="400001" maxlength="6" autocomplete="postal-code" />
+          <span class="err-msg">Enter a valid 6-digit pincode</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-pay" id="pay-btn" onclick="handlePay()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Proceed to Pay
+    </button>
+    <div class="secure-note">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      256-bit SSL secured &nbsp;·&nbsp; Powered by Razorpay
+    </div>
+  </div>
+
+  <!-- ── Right: Order Summary ── -->
+  <div class="summary-col">
+    <div class="summary-card">
+      <div class="section-title" style="font-size:17px;">Order Summary</div>
+
+      <div class="summary-product">
+        <img src="assets/images/gallery/gallery-product.jpeg" alt="FIOREN® Cream" class="summary-img" />
+        <div>
+          <div class="summary-product-name">FIOREN&reg; Advanced Anti-Ageing Renewal Cream</div>
+          <div class="summary-product-sub">50g &nbsp;·&nbsp; With Hyaluronic Acid, Ceramide &amp; Retinol</div>
+          <div class="qty-control">
+            <button class="qty-btn" id="qty-minus">&#8722;</button>
+            <div class="qty-val" id="qty-display">1</div>
+            <button class="qty-btn" id="qty-plus">&#43;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-rows">
+        <div class="price-row">
+          <span>Price (<span id="qty-label">1</span> item)</span>
+          <span class="strike" id="mrp-total">₹1,899</span>
+        </div>
+        <div class="price-row">
+          <span>Discount</span>
+          <span class="savings" id="savings-total">−₹300</span>
+        </div>
+        <div class="price-row">
+          <span>Delivery</span>
+          <span class="savings">FREE</span>
+        </div>
+        <div class="price-row total">
+          <span>Total</span>
+          <span id="grand-total">₹1,599</span>
+        </div>
+      </div>
+
+      <div class="free-delivery-badge">
+        &check; Free delivery on prepaid orders
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">FIOREN<sup style="font-size:10px;vertical-align:super;">&reg;</sup></div>
+        <p class="footer-tagline">
+          Advanced skincare crafted in India's most advanced scientific facility.<br/>WHO &middot; GMP &middot; US FDA certified for your trust.
+        </p>
+        <div class="footer-contact">
+          <a href="mailto:business@bioreachpharma.com">business@bioreachpharma.com</a><br/>
+          <a href="mailto:contact@bioreachpharma.com">contact@bioreachpharma.com</a><br/>
+          <a href="tel:+919270713844">+91 92707 13844</a> &nbsp;&middot;&nbsp; <a href="tel:+919130113844">+91 91301 13844</a>
+        </div>
+        <div class="footer-col-title" style="margin-bottom:12px;">STAY IN THE LOOP</div>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="Your email address" />
+          <button class="nl-btn">SUBSCRIBE</button>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">COMPANY</div>
+        <ul class="footer-links">
+          <li><a href="#">About Fioren</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">SUPPORT</div>
+        <ul class="footer-links">
+          <li><a href="mailto:contact@bioreachpharma.com">Contact Us</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="/refund-policy.html">Returns &amp; Refunds</a></li>
+          <li><a href="/shipping-policy.html">Shipping Policy</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom">
+      <div class="footer-copyright">&copy; 2026 Fioren&reg;. All rights reserved by <a href="https://www.bioreachpharma.com/" target="_blank" rel="noopener" style="color:inherit;">Bioreach Pharma Exports Pvt. Ltd.</a> &middot; Made in India &middot; WHO &middot; GMP &middot; US FDA Certified</div>
+      <div class="social-icons">
+        <div class="social-icon">f</div>
+        <div class="social-icon">ig</div>
+        <div class="social-icon">yt</div>
+        <div class="social-icon">in</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const UNIT_PRICE = 159900; // paise
+  const UNIT_MRP   = 189900; // paise
+
+  let qty = 1;
+
+  // Read qty from URL
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const q = parseInt(params.get('qty'), 10);
+    if (q && q > 0 && q <= 10) qty = q;
+    updateSummary();
+  })();
+
+  function updateSummary() {
+    document.getElementById('qty-display').textContent = qty;
+    document.getElementById('qty-label').textContent   = qty === 1 ? '1 item' : `${qty} items`;
+    const mrp     = UNIT_MRP * qty / 100;
+    const sale    = UNIT_PRICE * qty / 100;
+    const savings = mrp - sale;
+    document.getElementById('mrp-total').textContent    = '₹' + mrp.toLocaleString('en-IN');
+    document.getElementById('savings-total').textContent = '−₹' + savings.toLocaleString('en-IN');
+    document.getElementById('grand-total').textContent  = '₹' + sale.toLocaleString('en-IN');
+  }
+
+  document.getElementById('qty-minus').addEventListener('click', () => {
+    if (qty > 1) { qty--; updateSummary(); }
+  });
+  document.getElementById('qty-plus').addEventListener('click', () => {
+    if (qty < 10) { qty++; updateSummary(); }
+  });
+
+  // ── Validation ──
+  function validateField(wrapperId, inputId, test) {
+    const val = document.getElementById(inputId).value.trim();
+    const wrap = document.getElementById(wrapperId);
+    const pass = test(val);
+    wrap.classList.toggle('has-error', !pass);
+    return pass;
+  }
+
+  function validateAll() {
+    const results = [
+      validateField('f-name',  'inp-name',  v => v.length >= 2),
+      validateField('f-email', 'inp-email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
+      validateField('f-phone', 'inp-phone', v => /^\d{10}$/.test(v)),
+      validateField('f-addr1', 'inp-addr1', v => v.length >= 5),
+      validateField('f-city',  'inp-city',  v => v.length >= 2),
+      validateField('f-state', 'inp-state', v => v !== ''),
+      validateField('f-pin',   'inp-pin',   v => /^\d{6}$/.test(v)),
+    ];
+    return results.every(Boolean);
+  }
+
+  // Clear error on input
+  ['inp-name','inp-email','inp-phone','inp-addr1','inp-city','inp-state','inp-pin'].forEach(id => {
+    const el = document.getElementById(id);
+    const eventType = id === 'inp-state' ? 'change' : 'input';
+    el.addEventListener(eventType, () => {
+      el.closest('.field').classList.remove('has-error');
+    });
+  });
+
+  // ── Checkout ──
+  async function handlePay() {
+    if (!validateAll()) {
+      document.querySelector('.has-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const name    = document.getElementById('inp-name').value.trim();
+    const email   = document.getElementById('inp-email').value.trim();
+    const phone   = document.getElementById('inp-phone').value.trim();
+    const addr1   = document.getElementById('inp-addr1').value.trim();
+    const addr2   = document.getElementById('inp-addr2').value.trim();
+    const city    = document.getElementById('inp-city').value.trim();
+    const state   = document.getElementById('inp-state').value.trim();
+    const pin     = document.getElementById('inp-pin').value.trim();
+
+    const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
+
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = true;
+    btn.textContent = 'Please wait…';
+
+    try {
+      const amount = UNIT_PRICE * qty;
+
+      const [configRes, orderRes] = await Promise.all([
+        fetch('/api/config'),
+        fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            currency: 'INR',
+            receipt: `fioren_${Date.now()}`,
+            notes: {
+              customer_name:    name,
+              customer_email:   email,
+              customer_phone:   phone,
+              delivery_address: fullAddress,
+              quantity:         String(qty),
+            },
+          }),
+        }),
+      ]);
+
+      if (!configRes.ok || !orderRes.ok) throw new Error('Could not initiate payment');
+
+      const { key_id }                            = await configRes.json();
+      const { order_id, amount: orderAmount, currency } = await orderRes.json();
+
+      const options = {
+        key: key_id,
+        amount: orderAmount,
+        currency,
+        name: 'FIOREN®',
+        description: `Advanced Anti-Ageing Renewal Cream × ${qty}`,
+        image: '/assets/images/gallery/gallery-product.jpeg',
+        order_id,
+        theme: { color: '#7D5C4E' },
+        prefill: { name, email, contact: phone },
+        modal: { ondismiss: () => resetBtn() },
+        handler: async (response) => {
+          try {
+            const verifyRes = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+                customer_name:       name,
+                customer_email:      email,
+                customer_phone:      phone,
+                delivery_address:    fullAddress,
+                billing_addr1:       addr1,
+                billing_addr2:       addr2,
+                billing_city:        city,
+                billing_state:       state,
+                billing_pincode:     pin,
+                quantity:            qty,
+                amount:              UNIT_PRICE * qty,
+              }),
+            });
+            if (!verifyRes.ok) throw new Error('Verification failed');
+            window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(response.razorpay_payment_id)}&name=${encodeURIComponent(name)}`;
+          } catch {
+            alert('Payment verification failed. Please contact support.');
+            resetBtn();
+          }
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', r => {
+        alert(r.error.description || 'Payment failed. Please try again.');
+        resetBtn();
+      });
+      rzp.open();
+
+    } catch (err) {
+      alert(err.message || 'Something went wrong. Please try again.');
+      resetBtn();
+    }
+  }
+
+  function resetBtn() {
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Proceed to Pay`;
+  }
+</script>
+
+</body>
+</html>
