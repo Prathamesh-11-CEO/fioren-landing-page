@@ -662,6 +662,17 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 
     const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
 
+    if (typeof fbq === 'function') {
+      fbq('track', 'InitiateCheckout', {
+        content_name: 'FIOREN Advanced Anti-Ageing Renewal Cream',
+        content_ids: ['fioren-cream'],
+        content_type: 'product',
+        value: UNIT_PRICE * qty / 100,
+        currency: 'INR',
+        num_items: qty,
+      });
+    }
+
     const btn = document.getElementById('pay-btn');
     btn.disabled = true;
     btn.textContent = 'Please wait…';
@@ -723,7 +734,8 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
               }),
             });
             if (!verifyRes.ok) throw new Error('Verification failed');
-            window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(response.razorpay_payment_id)}&name=${encodeURIComponent(name)}`;
+            const purchaseValue = orderAmount / 100;
+            window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(response.razorpay_payment_id)}&name=${encodeURIComponent(name)}&value=${purchaseValue}&qty=${qty}`;
           } catch {
             alert('Payment verification failed. Please contact support.');
             resetBtn();

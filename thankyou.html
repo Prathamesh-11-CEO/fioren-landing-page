@@ -451,6 +451,20 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     document.getElementById('pidValue').textContent = pid;
     document.getElementById('pidBox').classList.add('visible');
   }
+
+  // Fire Purchase event once, using the real charged amount
+  const value = parseFloat(params.get('value'));
+  const qty   = parseInt(params.get('qty'), 10) || 1;
+  if (typeof fbq === 'function' && pid && value) {
+    fbq('track', 'Purchase', {
+      content_name: 'FIOREN Advanced Anti-Ageing Renewal Cream',
+      content_ids: ['fioren-cream'],
+      content_type: 'product',
+      value: value,
+      currency: 'INR',
+      num_items: qty,
+    }, { eventID: pid });
+  }
 </script>
 
 </body>
