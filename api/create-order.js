@@ -1,6 +1,6 @@
 const Razorpay = require('razorpay');
 
-const UNIT_PRICE = 100; // TEST MODE ₹1 — revert to 159900 before going live
+const UNIT_PRICE = 159900; // ₹1,599 in paise — server is authoritative, never trust client
 const MAX_QTY    = 10;
 
 module.exports = async (req, res) => {
