@@ -291,6 +291,37 @@
       text-align: center;
     }
 
+    /* ── Payment method selector ── */
+    .payment-options { display: flex; flex-direction: column; gap: 10px; }
+    .payment-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .payment-option:hover { border-color: var(--taupe); }
+    .payment-option.selected { border-color: var(--brown); background: rgba(125,92,78,.05); }
+    .payment-option input[type="radio"] { margin-top: 2px; accent-color: var(--brown); cursor: pointer; }
+    .payment-option-body { flex: 1; }
+    .payment-option-title { font-size: 14px; font-weight: 600; color: var(--dark); display: flex; justify-content: space-between; gap: 8px; }
+    .payment-option-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .payment-option-fee { font-size: 13px; font-weight: 600; color: var(--brown); }
+
+    .summary-payment-method {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-payment-method strong { color: var(--dark); }
+
     /* ── Footer ── */
     footer { background: var(--dark); color: #BDB5B0; padding: 56px 48px 28px; }
     .footer-inner { max-width: 1280px; margin: 0 auto; }
@@ -475,11 +506,35 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
       </div>
     </div>
 
+    <!-- Payment Method -->
+    <div class="form-section">
+      <div class="form-subtitle">Payment Method</div>
+      <div class="payment-options">
+        <label class="payment-option selected" id="pm-prepaid">
+          <input type="radio" name="payment-method" value="prepaid" checked />
+          <div class="payment-option-body">
+            <div class="payment-option-title">Prepaid (Card / UPI / Netbanking)</div>
+            <div class="payment-option-sub">Pay securely online via Razorpay</div>
+          </div>
+        </label>
+        <label class="payment-option" id="pm-cod">
+          <input type="radio" name="payment-method" value="cod" />
+          <div class="payment-option-body">
+            <div class="payment-option-title">
+              Cash on Delivery
+              <span class="payment-option-fee" id="cod-fee-label"></span>
+            </div>
+            <div class="payment-option-sub">Pay in cash when your order arrives</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
     <button class="btn-pay" id="pay-btn" onclick="handlePay()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      Proceed to Pay
+      <span id="pay-btn-label">Proceed to Pay</span>
     </button>
-    <div class="secure-note">
+    <div class="secure-note" id="secure-note">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       256-bit SSL secured &nbsp;·&nbsp; Powered by Razorpay
     </div>
@@ -503,6 +558,11 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         </div>
       </div>
 
+      <div class="summary-payment-method">
+        <span>Payment Method</span>
+        <strong id="summary-payment-label">Prepaid (Card / UPI / Netbanking)</strong>
+      </div>
+
       <div class="price-rows">
         <div class="price-row">
           <span>Price (<span id="qty-label">1</span> item)</span>
@@ -516,6 +576,10 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
           <span>Delivery</span>
           <span class="savings">FREE</span>
         </div>
+        <div class="price-row" id="cod-fee-row" style="display:none;">
+          <span>COD Fee</span>
+          <span id="cod-fee-total">₹0</span>
+        </div>
         <div class="price-row total">
           <span>Total</span>
           <span id="grand-total">₹1,599</span>
@@ -523,7 +587,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
       </div>
 
       <div class="free-delivery-badge">
-        &check; Free delivery on prepaid orders
+        &check; Free delivery
       </div>
     </div>
   </div>
@@ -584,8 +648,10 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 <script>
   const UNIT_PRICE = 159900; // paise
   const UNIT_MRP   = 189900; // paise
+  const COD_FEE    = 0;      // paise — added to total when Cash on Delivery is selected
 
   let qty = 1;
+  let paymentMethod = 'prepaid'; // 'prepaid' | 'cod'
 
   // Read qty from URL
   (function() {
@@ -601,9 +667,19 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     const mrp     = UNIT_MRP * qty / 100;
     const sale    = UNIT_PRICE * qty / 100;
     const savings = mrp - sale;
+    const codFee  = paymentMethod === 'cod' ? COD_FEE / 100 : 0;
+    const total   = sale + codFee;
+
     document.getElementById('mrp-total').textContent    = '₹' + mrp.toLocaleString('en-IN');
     document.getElementById('savings-total').textContent = '−₹' + savings.toLocaleString('en-IN');
-    document.getElementById('grand-total').textContent  = '₹' + sale.toLocaleString('en-IN');
+    document.getElementById('grand-total').textContent  = '₹' + total.toLocaleString('en-IN');
+
+    const codFeeRow = document.getElementById('cod-fee-row');
+    codFeeRow.style.display = codFee > 0 ? 'flex' : 'none';
+    document.getElementById('cod-fee-total').textContent = '₹' + codFee.toLocaleString('en-IN');
+
+    document.getElementById('summary-payment-label').textContent =
+      paymentMethod === 'cod' ? 'Cash on Delivery' : 'Prepaid (Card / UPI / Netbanking)';
   }
 
   document.getElementById('qty-minus').addEventListener('click', () => {
@@ -611,6 +687,64 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
   });
   document.getElementById('qty-plus').addEventListener('click', () => {
     if (qty < 10) { qty++; updateSummary(); }
+  });
+
+  // ── Payment method selector ──
+  const codFeeLabel = document.getElementById('cod-fee-label');
+  codFeeLabel.textContent = COD_FEE > 0 ? `+₹${(COD_FEE / 100).toLocaleString('en-IN')}` : '';
+
+  document.querySelectorAll('input[name="payment-method"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      paymentMethod = radio.value;
+      document.getElementById('pm-prepaid').classList.toggle('selected', paymentMethod === 'prepaid');
+      document.getElementById('pm-cod').classList.toggle('selected', paymentMethod === 'cod');
+      document.getElementById('pay-btn-label').textContent =
+        paymentMethod === 'cod' ? 'Place COD Order' : 'Proceed to Pay';
+      document.getElementById('secure-note').style.visibility =
+        paymentMethod === 'cod' ? 'hidden' : 'visible';
+      updateSummary();
+    });
+  });
+
+  // ── Checkout lead capture (fires once contact info is valid, before payment) ──
+  let leadSent = false;
+  function maybeCaptureLead() {
+    if (leadSent) return;
+
+    const name  = document.getElementById('inp-name').value.trim();
+    const email = document.getElementById('inp-email').value.trim();
+    const phone = document.getElementById('inp-phone').value.trim();
+
+    const nameValid  = name.length >= 2;
+    const phoneValid = /^\d{10}$/.test(phone);
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!nameValid || !(phoneValid || emailValid)) return;
+
+    leadSent = true;
+
+    const addr1 = document.getElementById('inp-addr1').value.trim();
+    const addr2 = document.getElementById('inp-addr2').value.trim();
+    const city  = document.getElementById('inp-city').value.trim();
+    const state = document.getElementById('inp-state').value.trim();
+    const pin   = document.getElementById('inp-pin').value.trim();
+    const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
+
+    fetch('/api/capture-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        customer_name:     name,
+        customer_email:    email,
+        customer_phone:    phone,
+        delivery_address:  fullAddress,
+        quantity:          qty,
+      }),
+    }).catch(() => {}); // best-effort — never surface this to the customer
+  }
+
+  ['inp-name', 'inp-email', 'inp-phone'].forEach(id => {
+    document.getElementById(id).addEventListener('blur', maybeCaptureLead);
   });
 
   // ── Validation ──
@@ -661,13 +795,15 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     const pin     = document.getElementById('inp-pin').value.trim();
 
     const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
+    const codFee      = paymentMethod === 'cod' ? COD_FEE : 0;
+    const totalValue  = (UNIT_PRICE * qty + codFee) / 100;
 
     if (typeof fbq === 'function') {
       fbq('track', 'InitiateCheckout', {
         content_name: 'FIOREN Advanced Anti-Ageing Renewal Cream',
         content_ids: ['fioren-cream'],
         content_type: 'product',
-        value: UNIT_PRICE * qty / 100,
+        value: totalValue,
         currency: 'INR',
         num_items: qty,
       });
@@ -676,6 +812,37 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     const btn = document.getElementById('pay-btn');
     btn.disabled = true;
     btn.textContent = 'Please wait…';
+
+    if (paymentMethod === 'cod') {
+      try {
+        const codRes = await fetch('/api/create-cod-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quantity:          qty,
+            customer_name:     name,
+            customer_email:    email,
+            customer_phone:    phone,
+            delivery_address:  fullAddress,
+            billing_addr1:     addr1,
+            billing_addr2:     addr2,
+            billing_city:      city,
+            billing_state:     state,
+            billing_pincode:   pin,
+          }),
+        });
+        if (!codRes.ok) {
+          const { error } = await codRes.json().catch(() => ({}));
+          throw new Error(error || 'Could not place order');
+        }
+        const { order_id, amount } = await codRes.json();
+        window.location.href = `/thankyou.html?order_id=${encodeURIComponent(order_id)}&name=${encodeURIComponent(name)}&value=${amount / 100}&qty=${qty}&payment_method=cod`;
+      } catch (err) {
+        alert(err.message || 'Something went wrong. Please try again.');
+        resetBtn();
+      }
+      return;
+    }
 
     try {
       const [configRes, orderRes] = await Promise.all([
@@ -735,7 +902,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
             });
             if (!verifyRes.ok) throw new Error('Verification failed');
             const purchaseValue = orderAmount / 100;
-            window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(response.razorpay_payment_id)}&name=${encodeURIComponent(name)}&value=${purchaseValue}&qty=${qty}`;
+            window.location.href = `/thankyou.html?payment_id=${encodeURIComponent(response.razorpay_payment_id)}&name=${encodeURIComponent(name)}&value=${purchaseValue}&qty=${qty}&payment_method=prepaid`;
           } catch {
             alert('Payment verification failed. Please contact support.');
             resetBtn();
@@ -759,7 +926,8 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
   function resetBtn() {
     const btn = document.getElementById('pay-btn');
     btn.disabled = false;
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Proceed to Pay`;
+    const label = paymentMethod === 'cod' ? 'Place COD Order' : 'Proceed to Pay';
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> <span id="pay-btn-label">${label}</span>`;
   }
 </script>
 

@@ -1,7 +1,5 @@
 const Razorpay = require('razorpay');
-
-const UNIT_PRICE = 159900; // ₹1,599 in paise — server is authoritative, never trust client
-const MAX_QTY    = 10;
+const { UNIT_PRICE, MAX_QTY } = require('./_lib/pricing');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
