@@ -1,6 +1,7 @@
 const { UNIT_PRICE, MAX_QTY, COD_FEE } = require('./_lib/pricing');
 const { sendOrderEmail } = require('./_lib/email');
 const { getShiprocketToken, createShiprocketOrder } = require('./_lib/shiprocket');
+const { sendMetaEvent, clientIpFrom } = require('./_lib/metaCapi');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
@@ -16,6 +17,10 @@ module.exports = async (req, res) => {
     billing_city,
     billing_state,
     billing_pincode,
+    event_id,
+    event_source_url,
+    fbp,
+    fbc,
   } = req.body;
 
   if (!customer_name || !customer_phone || !billing_addr1 || !billing_city || !billing_state || !billing_pincode) {
@@ -65,6 +70,50 @@ module.exports = async (req, res) => {
     console.log('Shiprocket COD order created — order_id:', srResult.order_id, 'shipment_id:', srResult.shipment_id);
   } catch (srErr) {
     console.error('Shiprocket COD order failed:', srErr.message);
+  }
+
+  // 3. Meta Conversions API — mirrors the browser's InitiateCheckout (client-generated
+  // event_id) and Purchase (orderId, matching what thankyou.html will fire client-side)
+  const metaUserData = {
+    email:           customer_email,
+    phone:           customer_phone,
+    clientIp:        clientIpFrom(req),
+    clientUserAgent: req.headers['user-agent'],
+    fbp, fbc,
+  };
+
+  if (event_id) {
+    try {
+      await sendMetaEvent({
+        eventName:      'InitiateCheckout',
+        eventId:        event_id,
+        eventSourceUrl: event_source_url,
+        ...metaUserData,
+        value:          amount / 100,
+        currency:       'INR',
+        contentIds:     ['fioren-cream'],
+        contentName:    'FIOREN Advanced Anti-Ageing Renewal Cream',
+        numItems:       qty,
+      });
+    } catch (err) {
+      console.error('Meta CAPI InitiateCheckout (COD) failed:', err.message);
+    }
+  }
+
+  try {
+    await sendMetaEvent({
+      eventName:      'Purchase',
+      eventId:        orderId,
+      eventSourceUrl: event_source_url,
+      ...metaUserData,
+      value:          amount / 100,
+      currency:       'INR',
+      contentIds:     ['fioren-cream'],
+      contentName:    'FIOREN Advanced Anti-Ageing Renewal Cream',
+      numItems:       qty,
+    });
+  } catch (err) {
+    console.error('Meta CAPI Purchase (COD) failed:', err.message);
   }
 
   res.json({ success: true, order_id: orderId, amount });
