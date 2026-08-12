@@ -140,6 +140,19 @@
       word-break: break-all;
     }
 
+    .cod-banner {
+      background: #FCEFD8;
+      border: 1px solid #E8CE9B;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8A5A1C;
+    }
+    .cod-banner.visible { display: block; }
+
     .steps {
       display: flex;
       flex-direction: column;
@@ -343,8 +356,12 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
       You'll receive a confirmation email shortly with tracking details.
     </p>
 
+    <div class="cod-banner" id="codBanner">
+      Cash on Delivery — Pay <span id="codAmount">—</span> to the delivery agent on arrival
+    </div>
+
     <div class="payment-id-box" id="pidBox">
-      <div class="pid-label">Payment Reference</div>
+      <div class="pid-label" id="pidLabel">Payment Reference</div>
       <div class="pid-value" id="pidValue">—</div>
     </div>
 
@@ -369,7 +386,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         <div class="step-num">3</div>
         <div class="step-text">
           <strong>Delivered in 3–5 Days</strong>
-          <span>Free delivery on your prepaid order. Sit back and relax!</span>
+          <span>Free delivery on your order. Sit back and relax!</span>
         </div>
       </div>
     </div>
@@ -446,17 +463,25 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
       `Thank you, ${name.split(' ')[0]}!<br>Your order is confirmed.`;
   }
 
-  // Show payment reference ID
-  const pid = params.get('payment_id');
-  if (pid) {
-    document.getElementById('pidValue').textContent = pid;
+  // Show payment/order reference — prepaid orders carry payment_id, COD orders carry order_id
+  const isCod = params.get('payment_method') === 'cod';
+  const ref   = params.get('payment_id') || params.get('order_id');
+  const value = parseFloat(params.get('value'));
+
+  if (ref) {
+    document.getElementById('pidLabel').textContent = isCod ? 'Order ID' : 'Payment Reference';
+    document.getElementById('pidValue').textContent  = ref;
     document.getElementById('pidBox').classList.add('visible');
   }
 
+  if (isCod && value) {
+    document.getElementById('codAmount').textContent = '₹' + value.toLocaleString('en-IN');
+    document.getElementById('codBanner').classList.add('visible');
+  }
+
   // Fire Purchase event once, using the real charged amount
-  const value = parseFloat(params.get('value'));
-  const qty   = parseInt(params.get('qty'), 10) || 1;
-  if (typeof fbq === 'function' && pid && value) {
+  const qty = parseInt(params.get('qty'), 10) || 1;
+  if (typeof fbq === 'function' && ref && value) {
     fbq('track', 'Purchase', {
       content_name: 'FIOREN Advanced Anti-Ageing Renewal Cream',
       content_ids: ['fioren-cream'],
@@ -464,7 +489,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
       value: value,
       currency: 'INR',
       num_items: qty,
-    }, { eventID: pid });
+    }, { eventID: ref });
   }
 </script>
 
