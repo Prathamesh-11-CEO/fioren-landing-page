@@ -6,10 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-app.get('/api/config',           require('./api/config'));
-app.post('/api/create-order',    require('./api/create-order'));
+app.get('/api/config',            require('./api/config'));
+app.post('/api/create-order',     require('./api/create-order'));
 app.post('/api/create-cod-order', require('./api/create-cod-order'));
-app.post('/api/verify-payment',  require('./api/verify-payment'));
+app.post('/api/verify-payment',   require('./api/verify-payment'));
+app.post('/api/capture-lead',     require('./api/capture-lead'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

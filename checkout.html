@@ -706,6 +706,47 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     });
   });
 
+  // ── Checkout lead capture (fires once contact info is valid, before payment) ──
+  let leadSent = false;
+  function maybeCaptureLead() {
+    if (leadSent) return;
+
+    const name  = document.getElementById('inp-name').value.trim();
+    const email = document.getElementById('inp-email').value.trim();
+    const phone = document.getElementById('inp-phone').value.trim();
+
+    const nameValid  = name.length >= 2;
+    const phoneValid = /^\d{10}$/.test(phone);
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!nameValid || !(phoneValid || emailValid)) return;
+
+    leadSent = true;
+
+    const addr1 = document.getElementById('inp-addr1').value.trim();
+    const addr2 = document.getElementById('inp-addr2').value.trim();
+    const city  = document.getElementById('inp-city').value.trim();
+    const state = document.getElementById('inp-state').value.trim();
+    const pin   = document.getElementById('inp-pin').value.trim();
+    const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
+
+    fetch('/api/capture-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        customer_name:     name,
+        customer_email:    email,
+        customer_phone:    phone,
+        delivery_address:  fullAddress,
+        quantity:          qty,
+      }),
+    }).catch(() => {}); // best-effort — never surface this to the customer
+  }
+
+  ['inp-name', 'inp-email', 'inp-phone'].forEach(id => {
+    document.getElementById(id).addEventListener('blur', maybeCaptureLead);
+  });
+
   // ── Validation ──
   function validateField(wrapperId, inputId, test) {
     const val = document.getElementById(inputId).value.trim();
