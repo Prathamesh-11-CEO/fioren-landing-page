@@ -384,8 +384,8 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '2243393852975173');
-fbq('track', 'PageView');
 </script>
+<script src="/assets/js/meta-pageview.js"></script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 /></noscript>
@@ -650,6 +650,20 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
   const UNIT_MRP   = 189900; // paise
   const COD_FEE    = 0;      // paise — added to total when Cash on Delivery is selected
 
+  // ── Meta Conversions API helpers ──
+  function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  function uuid() {
+    if (crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   let qty = 1;
   let paymentMethod = 'prepaid'; // 'prepaid' | 'cod'
 
@@ -798,6 +812,12 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
     const codFee      = paymentMethod === 'cod' ? COD_FEE : 0;
     const totalValue  = (UNIT_PRICE * qty + codFee) / 100;
 
+    // Shared event ID so the browser pixel and server-side Conversions API
+    // copies of this InitiateCheckout get deduplicated by Meta as one event.
+    const checkoutEventId = uuid();
+    const fbp = getCookie('_fbp');
+    const fbc = getCookie('_fbc');
+
     if (typeof fbq === 'function') {
       fbq('track', 'InitiateCheckout', {
         content_name: 'FIOREN Advanced Anti-Ageing Renewal Cream',
@@ -806,7 +826,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         value: totalValue,
         currency: 'INR',
         num_items: qty,
-      });
+      }, { eventID: checkoutEventId });
     }
 
     const btn = document.getElementById('pay-btn');
@@ -829,6 +849,9 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
             billing_city:      city,
             billing_state:     state,
             billing_pincode:   pin,
+            event_id:          checkoutEventId,
+            event_source_url:  window.location.href,
+            fbp, fbc,
           }),
         });
         if (!codRes.ok) {
@@ -860,6 +883,9 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
               customer_phone:   phone,
               delivery_address: fullAddress,
             },
+            event_id:         checkoutEventId,
+            event_source_url: window.location.href,
+            fbp, fbc,
           }),
         }),
       ]);
@@ -898,6 +924,8 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
                 billing_city:        city,
                 billing_state:       state,
                 billing_pincode:     pin,
+                event_source_url:    window.location.href,
+                fbp, fbc,
               }),
             });
             if (!verifyRes.ok) throw new Error('Verification failed');

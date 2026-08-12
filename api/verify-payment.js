@@ -2,6 +2,7 @@ const crypto     = require('crypto');
 const Razorpay   = require('razorpay');
 const { sendOrderEmail } = require('./_lib/email');
 const { getShiprocketToken, createShiprocketOrder } = require('./_lib/shiprocket');
+const { sendMetaEvent, clientIpFrom } = require('./_lib/metaCapi');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
@@ -19,6 +20,9 @@ module.exports = async (req, res) => {
     billing_state,
     billing_pincode,
     delivery_address,
+    event_source_url,
+    fbp,
+    fbc,
   } = req.body;
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -85,6 +89,28 @@ module.exports = async (req, res) => {
     console.log('Shiprocket order created — order_id:', srResult.order_id, 'shipment_id:', srResult.shipment_id);
   } catch (srErr) {
     console.error('Shiprocket order failed:', srErr.message);
+  }
+
+  // 5. Meta Conversions API — mirrors the browser's Purchase event, deduplicated via
+  // event_id = razorpay_payment_id (the same ID thankyou.html uses client-side)
+  try {
+    await sendMetaEvent({
+      eventName:       'Purchase',
+      eventId:         razorpay_payment_id,
+      eventSourceUrl:  event_source_url,
+      email:           customer_email,
+      phone:           customer_phone,
+      clientIp:        clientIpFrom(req),
+      clientUserAgent: req.headers['user-agent'],
+      fbp, fbc,
+      value:           actualAmount / 100,
+      currency:        'INR',
+      contentIds:      ['fioren-cream'],
+      contentName:     'FIOREN Advanced Anti-Ageing Renewal Cream',
+      numItems:        actualQty,
+    });
+  } catch (err) {
+    console.error('Meta CAPI Purchase failed:', err.message);
   }
 
   res.json({ success: true, payment_id: razorpay_payment_id });
