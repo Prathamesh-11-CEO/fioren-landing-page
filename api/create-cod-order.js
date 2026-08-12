@@ -31,7 +31,37 @@ module.exports = async (req, res) => {
   const amount = UNIT_PRICE * qty + COD_FEE; // paise — server is authoritative, never trust client
   const orderId = `COD_${Date.now()}`;
 
-  // 1. Send order notification email (blocking — this is the merchant's only order visibility, so a
+  const metaUserData = {
+    email:           customer_email,
+    phone:           customer_phone,
+    clientIp:        clientIpFrom(req),
+    clientUserAgent: req.headers['user-agent'],
+    fbp, fbc,
+  };
+
+  // 1. Meta Conversions API — mirrors the browser's InitiateCheckout (client-generated
+  // event_id). Sent before email/Shiprocket, and independent of whether they succeed —
+  // the client already fired the pixel event on button click, so a downstream failure
+  // here must not cause the server-side copy to go missing.
+  if (event_id) {
+    try {
+      await sendMetaEvent({
+        eventName:      'InitiateCheckout',
+        eventId:        event_id,
+        eventSourceUrl: event_source_url,
+        ...metaUserData,
+        value:          amount / 100,
+        currency:       'INR',
+        contentIds:     ['fioren-cream'],
+        contentName:    'FIOREN Advanced Anti-Ageing Renewal Cream',
+        numItems:       qty,
+      });
+    } catch (err) {
+      console.error('Meta CAPI InitiateCheckout (COD) failed:', err.message);
+    }
+  }
+
+  // 2. Send order notification email (blocking — this is the merchant's only order visibility, so a
   // failure here must surface to the customer via the 500 response rather than fail silently)
   try {
     await sendOrderEmail({
@@ -50,7 +80,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'Could not place order. Please try again.' });
   }
 
-  // 2. Create Shiprocket order (non-blocking — email already confirmed the order exists)
+  // 3. Create Shiprocket order (non-blocking — email already confirmed the order exists)
   try {
     const token    = await getShiprocketToken();
     const srResult = await createShiprocketOrder(token, {
@@ -72,34 +102,8 @@ module.exports = async (req, res) => {
     console.error('Shiprocket COD order failed:', srErr.message);
   }
 
-  // 3. Meta Conversions API — mirrors the browser's InitiateCheckout (client-generated
-  // event_id) and Purchase (orderId, matching what thankyou.html will fire client-side)
-  const metaUserData = {
-    email:           customer_email,
-    phone:           customer_phone,
-    clientIp:        clientIpFrom(req),
-    clientUserAgent: req.headers['user-agent'],
-    fbp, fbc,
-  };
-
-  if (event_id) {
-    try {
-      await sendMetaEvent({
-        eventName:      'InitiateCheckout',
-        eventId:        event_id,
-        eventSourceUrl: event_source_url,
-        ...metaUserData,
-        value:          amount / 100,
-        currency:       'INR',
-        contentIds:     ['fioren-cream'],
-        contentName:    'FIOREN Advanced Anti-Ageing Renewal Cream',
-        numItems:       qty,
-      });
-    } catch (err) {
-      console.error('Meta CAPI InitiateCheckout (COD) failed:', err.message);
-    }
-  }
-
+  // 4. Meta Conversions API — mirrors the browser's Purchase, gated on the order having
+  // actually succeeded (matches the client, which only reaches thankyou.html on success)
   try {
     await sendMetaEvent({
       eventName:      'Purchase',
