@@ -42,11 +42,13 @@ module.exports = async (req, res) => {
   // 2. Fetch authoritative order details from Razorpay (amount & qty from server, not client)
   let actualAmount = 0;
   let actualQty    = 1;
+  let couponCode   = '';
   try {
     const rzp      = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET });
     const rzpOrder = await rzp.orders.fetch(razorpay_order_id);
     actualAmount   = rzpOrder.amount;
     actualQty      = parseInt(rzpOrder.notes?.quantity, 10) || 1;
+    couponCode     = rzpOrder.notes?.coupon_code || '';
   } catch (fetchErr) {
     console.error('Razorpay order fetch failed:', fetchErr.message);
     // non-fatal — proceed with fallback (signature already verified above)
@@ -64,6 +66,7 @@ module.exports = async (req, res) => {
       paymentMethod: 'Prepaid',
       paymentId:     razorpay_payment_id,
       orderId:       razorpay_order_id,
+      couponCode,
     });
   } catch (emailErr) {
     console.error('Order email failed:', emailErr.message);

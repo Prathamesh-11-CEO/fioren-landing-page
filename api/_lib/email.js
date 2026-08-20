@@ -19,7 +19,7 @@ function createTransporter() {
   });
 }
 
-function orderEmailHtml({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId }) {
+function orderEmailHtml({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId, couponCode }) {
   const rupees = (amount / 100).toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
   const isCod  = paymentMethod === 'COD';
 
@@ -86,6 +86,7 @@ function orderEmailHtml({ name, email, phone, address, qty, amount, paymentMetho
                   <tr><td style="color:#6B5C55;width:130px;">Product</td><td>FIOREN® Advanced Anti-Ageing Renewal Cream (50g)</td></tr>
                   <tr><td style="color:#6B5C55;">Quantity</td><td>${escHtml(String(qty))}</td></tr>
                   <tr><td style="color:#6B5C55;">${isCod ? 'Order Total' : 'Amount Paid'}</td><td><strong style="color:#7D5C4E;">${rupees}</strong></td></tr>
+                  ${couponCode ? `<tr><td style="color:#6B5C55;">Coupon Applied</td><td><strong>${escHtml(couponCode)}</strong></td></tr>` : ''}
                   ${paymentId ? `<tr><td style="color:#6B5C55;">Payment ID</td><td style="font-size:12px;word-break:break-all;">${escHtml(paymentId)}</td></tr>` : ''}
                   <tr><td style="color:#6B5C55;">Order ID</td><td style="font-size:12px;word-break:break-all;">${escHtml(orderId)}</td></tr>
                 </table>
@@ -106,14 +107,14 @@ function orderEmailHtml({ name, email, phone, address, qty, amount, paymentMetho
 </html>`;
 }
 
-async function sendOrderEmail({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId }) {
+async function sendOrderEmail({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId, couponCode }) {
   const transporter = createTransporter();
   const rupeesLabel  = (amount / 100).toLocaleString('en-IN');
   await transporter.sendMail({
     from:    `"FIOREN® Orders" <${process.env.GMAIL_USER}>`,
     to:      process.env.GMAIL_USER,
     subject: `New Order — ${name || 'Customer'} · ₹${rupeesLabel} · ${paymentMethod === 'COD' ? 'COD' : 'Prepaid'}`,
-    html:    orderEmailHtml({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId }),
+    html:    orderEmailHtml({ name, email, phone, address, qty, amount, paymentMethod, paymentId, orderId, couponCode }),
   });
 }
 
