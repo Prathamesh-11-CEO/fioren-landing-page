@@ -419,6 +419,35 @@
       color: var(--muted);
       margin-top: 5px;
     }
+    .coupon-offer {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #FCEFD8;
+      border: 1px dashed #E8CE9B;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: #8A5A1C;
+      font-weight: 600;
+    }
+    .coupon-offer .coupon-code {
+      background: #8A5A1C;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .coupon-offer-note {
+      width: 100%;
+      font-size: 11px;
+      font-weight: 600;
+      color: #8A5A1C;
+      margin-top: 2px;
+    }
 
     .qty-label {
       font-size: 11px;
@@ -1081,6 +1110,23 @@
       font-size: 11px;
       color: var(--muted);
       text-decoration: line-through;
+    }
+    .sticky-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .sticky-cod-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--green);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sticky-coupon-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: #8A5A1C;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sticky-btn {
       flex: 0 0 auto;
@@ -1987,7 +2033,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
      ANNOUNCEMENT BAR
 ════════════════════════════════════════════════════════ -->
 <div class="announcement-bar">
-  <span class="announcement-inner">WHO · GMP · US FDA Certified &nbsp;&nbsp;·&nbsp;&nbsp; Crafted in India's Advanced Scientific Facility &nbsp;&nbsp;·&nbsp;&nbsp; Free Delivery on Prepaid Orders &emsp;&emsp;&emsp;&emsp; WHO · GMP · US FDA Certified &nbsp;&nbsp;·&nbsp;&nbsp; Crafted in India's Advanced Scientific Facility &nbsp;&nbsp;·&nbsp;&nbsp; Free Delivery on Prepaid Orders &emsp;&emsp;&emsp;&emsp;</span>
+  <span class="announcement-inner">WHO · GMP · US FDA Certified &nbsp;&nbsp;·&nbsp;&nbsp; Free Delivery Across India &nbsp;&nbsp;·&nbsp;&nbsp; Cash on Delivery Available &nbsp;&nbsp;·&nbsp;&nbsp; Use Code FIOREN610 for ₹989 &emsp;&emsp;&emsp;&emsp; WHO · GMP · US FDA Certified &nbsp;&nbsp;·&nbsp;&nbsp; Free Delivery Across India &nbsp;&nbsp;·&nbsp;&nbsp; Cash on Delivery Available &nbsp;&nbsp;·&nbsp;&nbsp; Use Code FIOREN610 for ₹989 &emsp;&emsp;&emsp;&emsp;</span>
 </div>
 
 <!-- ════════════════════════════════════════════════════════
@@ -2070,6 +2116,10 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
             <span class="price-badge">SAVE 28%</span>
           </div>
           <span class="price-note">MRP inclusive of all taxes</span>
+          <div class="coupon-offer">
+            Use code <span class="coupon-code">FIOREN610</span> for ₹989 &mdash; limited time offer
+            <div class="coupon-offer-note">Valid for 2 hours once applied at checkout</div>
+          </div>
         </div>
         <div>
           <div class="qty-label">QUANTITY</div>
@@ -2811,9 +2861,13 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 
 <!-- ════ STICKY MOBILE CTA ════ -->
 <div class="sticky-cta" id="sticky-cta">
-  <div class="sticky-price">
-    <span class="sticky-price-sale">₹1,599</span>
-    <span class="sticky-price-orig">₹1,899</span>
+  <div class="sticky-info">
+    <div class="sticky-price">
+      <span class="sticky-price-sale">₹1,599</span>
+      <span class="sticky-price-orig">₹1,899</span>
+    </div>
+    <div class="sticky-cod-badge">Cash on Delivery available &mdash; no extra charge</div>
+    <div class="sticky-coupon-badge">Use code FIOREN610 for ₹989</div>
   </div>
   <button class="sticky-btn">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>

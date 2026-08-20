@@ -1,14 +1,17 @@
 const Razorpay = require('razorpay');
-const { UNIT_PRICE, MAX_QTY } = require('./_lib/pricing');
+const { UNIT_PRICE, MAX_QTY, getCouponDiscount } = require('./_lib/pricing');
 const { sendMetaEvent, clientIpFrom } = require('./_lib/metaCapi');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { currency = 'INR', receipt, notes, quantity, event_id, event_source_url, fbp, fbc } = req.body;
+  const { currency = 'INR', receipt, notes, quantity, coupon_code, event_id, event_source_url, fbp, fbc } = req.body;
 
-  const qty    = Math.max(1, Math.min(MAX_QTY, parseInt(quantity, 10) || 1));
-  const amount = UNIT_PRICE * qty;
+  const qty        = Math.max(1, Math.min(MAX_QTY, parseInt(quantity, 10) || 1));
+  const discount    = getCouponDiscount(coupon_code); // paise off per unit — 0 if invalid/absent
+  const unitPrice   = UNIT_PRICE - discount;
+  const amount      = unitPrice * qty;
+  const appliedCode = discount ? String(coupon_code).trim().toUpperCase() : null;
 
   // Server-side mirror of the browser's InitiateCheckout, deduplicated via event_id.
   // Sent before the Razorpay call (and independent of whether it succeeds) — the
@@ -47,7 +50,7 @@ module.exports = async (req, res) => {
       amount,
       currency,
       receipt: receipt || `rcpt_${Date.now()}`,
-      notes:   { ...(notes || {}), quantity: String(qty) },
+      notes:   { ...(notes || {}), quantity: String(qty), coupon_code: appliedCode || '' },
     });
   } catch (err) {
     console.error('Razorpay create-order error:', err);

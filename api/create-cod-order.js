@@ -1,4 +1,4 @@
-const { UNIT_PRICE, MAX_QTY, COD_FEE } = require('./_lib/pricing');
+const { UNIT_PRICE, MAX_QTY, COD_FEE, getCouponDiscount } = require('./_lib/pricing');
 const { sendOrderEmail } = require('./_lib/email');
 const { getShiprocketToken, createShiprocketOrder } = require('./_lib/shiprocket');
 const { sendMetaEvent, clientIpFrom } = require('./_lib/metaCapi');
@@ -8,6 +8,7 @@ module.exports = async (req, res) => {
 
   const {
     quantity,
+    coupon_code,
     customer_name,
     customer_email,
     customer_phone,
@@ -27,8 +28,11 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const qty    = Math.max(1, Math.min(MAX_QTY, parseInt(quantity, 10) || 1));
-  const amount = UNIT_PRICE * qty + COD_FEE; // paise — server is authoritative, never trust client
+  const qty        = Math.max(1, Math.min(MAX_QTY, parseInt(quantity, 10) || 1));
+  const discount    = getCouponDiscount(coupon_code); // paise off per unit — 0 if invalid/absent
+  const unitPrice   = UNIT_PRICE - discount;
+  const amount      = unitPrice * qty + COD_FEE; // paise — server is authoritative, never trust client
+  const appliedCode = discount ? String(coupon_code).trim().toUpperCase() : '';
   const orderId = `COD_${Date.now()}`;
 
   const metaUserData = {
@@ -74,6 +78,7 @@ module.exports = async (req, res) => {
       paymentMethod: 'COD',
       paymentId:     null,
       orderId,
+      couponCode:    appliedCode,
     });
   } catch (emailErr) {
     console.error('COD order email failed:', emailErr.message);

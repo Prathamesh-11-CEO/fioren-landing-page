@@ -12,6 +12,7 @@ app.post('/api/create-cod-order', require('./api/create-cod-order'));
 app.post('/api/verify-payment',   require('./api/verify-payment'));
 app.post('/api/capture-lead',     require('./api/capture-lead'));
 app.post('/api/track-pageview',   require('./api/track-pageview'));
+app.post('/api/validate-coupon',  require('./api/validate-coupon'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

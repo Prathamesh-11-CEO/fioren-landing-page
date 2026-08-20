@@ -291,6 +291,48 @@
       text-align: center;
     }
 
+    /* ── Coupon ── */
+    .coupon-box { display: flex; gap: 8px; margin-bottom: 8px; }
+    .coupon-box input {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
+      font-size: 13px;
+      color: var(--dark);
+      text-transform: uppercase;
+    }
+    .coupon-box input:focus { outline: none; border-color: var(--brown); }
+    .coupon-box input:disabled { background: var(--bg); color: var(--muted); }
+    .coupon-apply-btn {
+      padding: 10px 18px;
+      background: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--ff-sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .coupon-apply-btn:hover { background: var(--brown-dk); }
+    .coupon-apply-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .coupon-msg { font-size: 12px; margin-bottom: 16px; min-height: 15px; }
+    .coupon-msg.success { color: #3A7D5C; font-weight: 600; }
+    .coupon-msg.error { color: #c0392b; }
+    .coupon-timer {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c0392b;
+      margin-top: -10px;
+      margin-bottom: 16px;
+    }
+
     /* ── Payment method selector ── */
     .payment-options { display: flex; flex-direction: column; gap: 10px; }
     .payment-option {
@@ -386,6 +428,7 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '2243393852975173');
 </script>
 <script src="/assets/js/meta-pageview.js"></script>
+<script src="/assets/js/coupon-timer.js"></script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 /></noscript>
@@ -563,6 +606,13 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         <strong id="summary-payment-label">Prepaid (Card / UPI / Netbanking)</strong>
       </div>
 
+      <div class="coupon-box">
+        <input type="text" id="coupon-input" placeholder="Enter coupon code" autocomplete="off" />
+        <button type="button" class="coupon-apply-btn" id="coupon-apply-btn">Apply</button>
+      </div>
+      <div class="coupon-msg" id="coupon-msg"></div>
+      <div class="coupon-timer" id="coupon-timer" style="display:none;"></div>
+
       <div class="price-rows">
         <div class="price-row">
           <span>Price (<span id="qty-label">1</span> item)</span>
@@ -571,6 +621,10 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         <div class="price-row">
           <span>Discount</span>
           <span class="savings" id="savings-total">−₹300</span>
+        </div>
+        <div class="price-row" id="coupon-discount-row" style="display:none;">
+          <span>Coupon (<span id="coupon-code-label"></span>)</span>
+          <span class="savings" id="coupon-discount-total">−₹0</span>
         </div>
         <div class="price-row">
           <span>Delivery</span>
@@ -666,6 +720,8 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 
   let qty = 1;
   let paymentMethod = 'prepaid'; // 'prepaid' | 'cod'
+  let appliedCoupon = null;      // e.g. 'FIOREN610'
+  let couponDiscountPerUnit = 0; // paise off per unit
 
   // Read qty from URL
   (function() {
@@ -678,15 +734,21 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
   function updateSummary() {
     document.getElementById('qty-display').textContent = qty;
     document.getElementById('qty-label').textContent   = qty === 1 ? '1 item' : `${qty} items`;
-    const mrp     = UNIT_MRP * qty / 100;
-    const sale    = UNIT_PRICE * qty / 100;
-    const savings = mrp - sale;
-    const codFee  = paymentMethod === 'cod' ? COD_FEE / 100 : 0;
-    const total   = sale + codFee;
+    const mrp            = UNIT_MRP * qty / 100;
+    const sale            = UNIT_PRICE * qty / 100;
+    const savings          = mrp - sale;
+    const couponDiscount   = couponDiscountPerUnit * qty / 100;
+    const codFee           = paymentMethod === 'cod' ? COD_FEE / 100 : 0;
+    const total            = sale - couponDiscount + codFee;
 
     document.getElementById('mrp-total').textContent    = '₹' + mrp.toLocaleString('en-IN');
     document.getElementById('savings-total').textContent = '−₹' + savings.toLocaleString('en-IN');
     document.getElementById('grand-total').textContent  = '₹' + total.toLocaleString('en-IN');
+
+    const couponRow = document.getElementById('coupon-discount-row');
+    couponRow.style.display = couponDiscount > 0 ? 'flex' : 'none';
+    document.getElementById('coupon-code-label').textContent = appliedCoupon || '';
+    document.getElementById('coupon-discount-total').textContent = '−₹' + couponDiscount.toLocaleString('en-IN');
 
     const codFeeRow = document.getElementById('cod-fee-row');
     codFeeRow.style.display = codFee > 0 ? 'flex' : 'none';
@@ -718,6 +780,58 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
         paymentMethod === 'cod' ? 'hidden' : 'visible';
       updateSummary();
     });
+  });
+
+  // ── Coupon ──
+  const couponInput   = document.getElementById('coupon-input');
+  const couponBtn     = document.getElementById('coupon-apply-btn');
+  const couponMsg     = document.getElementById('coupon-msg');
+
+  async function applyCoupon() {
+    const code = couponInput.value.trim();
+    couponMsg.textContent = '';
+    couponMsg.className = 'coupon-msg';
+    if (!code) return;
+
+    couponBtn.disabled = true;
+    couponBtn.textContent = 'Applying…';
+
+    try {
+      const res = await fetch('/api/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, quantity: qty }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.valid) {
+        appliedCoupon = null;
+        couponDiscountPerUnit = 0;
+        couponMsg.textContent = data.error || 'Invalid coupon code';
+        couponMsg.classList.add('error');
+      } else {
+        appliedCoupon = data.code;
+        couponDiscountPerUnit = data.discount_per_unit;
+        couponMsg.textContent = `Coupon ${data.code} applied!`;
+        couponMsg.classList.add('success');
+        couponInput.disabled = true;
+        window.FiorenCouponTimer?.start('coupon-timer');
+      }
+    } catch {
+      appliedCoupon = null;
+      couponDiscountPerUnit = 0;
+      couponMsg.textContent = 'Could not validate coupon. Please try again.';
+      couponMsg.classList.add('error');
+    }
+
+    couponBtn.disabled = false;
+    couponBtn.textContent = 'Apply';
+    updateSummary();
+  }
+
+  couponBtn.addEventListener('click', applyCoupon);
+  couponInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); }
   });
 
   // ── Checkout lead capture (fires once contact info is valid, before payment) ──
@@ -810,7 +924,8 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
 
     const fullAddress = [addr1, addr2, city, state, pin].filter(Boolean).join(', ');
     const codFee      = paymentMethod === 'cod' ? COD_FEE : 0;
-    const totalValue  = (UNIT_PRICE * qty + codFee) / 100;
+    const couponOff   = couponDiscountPerUnit * qty;
+    const totalValue  = (UNIT_PRICE * qty - couponOff + codFee) / 100;
 
     // Shared event ID so the browser pixel and server-side Conversions API
     // copies of this InitiateCheckout get deduplicated by Meta as one event.
@@ -840,6 +955,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             quantity:          qty,
+            coupon_code:       appliedCoupon,
             customer_name:     name,
             customer_email:    email,
             customer_phone:    phone,
@@ -875,6 +991,7 @@ src="https://www.facebook.com/tr?id=2243393852975173&ev=PageView&noscript=1"
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             quantity: qty,
+            coupon_code: appliedCoupon,
             currency: 'INR',
             receipt: `fioren_${Date.now()}`,
             notes: {
